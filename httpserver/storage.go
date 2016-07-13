@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"path"
 	"runtime"
 	"time"
 )
@@ -66,7 +67,9 @@ func methodRouter(w http.ResponseWriter, r *http.Request) {
 
 //读取文件
 func sendFile(w http.ResponseWriter, r *http.Request) {
-	f, err := fs.Open(r.URL.Path)
+	file := path.Clean(r.URL.Path)
+
+	f, err := fs.Open(file)
 	if err != nil {
 		http.NotFound(w, r)
 		return
@@ -75,7 +78,7 @@ func sendFile(w http.ResponseWriter, r *http.Request) {
 
 	d, err := f.Stat()
 	if err != nil {
-		log.Println(r.Method + " " + r.URL.Path + " " + err.Error())
+		log.Println(r.Method + " " + file + " " + err.Error())
 		http.NotFound(w, r)
 		return
 	}
@@ -90,10 +93,19 @@ func sendFile(w http.ResponseWriter, r *http.Request) {
 
 //保存文件
 func saveFile(w http.ResponseWriter, r *http.Request) {
-	f, err := fs.OpenFile(r.URL.Path, os.O_WRONLY|os.O_CREATE|os.O_EXCL|os.O_TRUNC, 0777)
+	file := path.Clean(r.URL.Path)
+	dir := path.Dir(file)
+	if dir != "/" {
+		_, err := fs.Stat(dir)
+		if os.IsNotExist(err) {
+			fs.MkdirAll(dir, os.ModePerm)
+		}
+	}
+
+	f, err := fs.OpenFile(file, os.O_WRONLY|os.O_CREATE|os.O_EXCL|os.O_TRUNC, 0777)
 	if err != nil {
 		http.Error(w, "Fail "+err.Error(), 500)
-		log.Println("Put Fail" + r.URL.Path + " " + r.RemoteAddr + " " + err.Error())
+		log.Println("Put Fail " + file + " " + r.RemoteAddr + " " + err.Error())
 		return
 	}
 	defer f.Close()
@@ -101,7 +113,7 @@ func saveFile(w http.ResponseWriter, r *http.Request) {
 	_, err = io.Copy(f, r.Body)
 	if err != nil {
 		http.Error(w, "Fail "+err.Error(), 500)
-		log.Println("Put Fail" + r.URL.Path + " " + r.RemoteAddr + " " + err.Error())
+		log.Println("Put Fail " + file + " " + r.RemoteAddr + " " + err.Error())
 		return
 	}
 
@@ -110,10 +122,12 @@ func saveFile(w http.ResponseWriter, r *http.Request) {
 
 //删除文件
 func deleteFile(w http.ResponseWriter, r *http.Request) {
-	err := fs.Remove(r.URL.Path)
+	file := path.Clean(r.URL.Path)
+
+	err := fs.Remove(file)
 	if err != nil {
 		http.Error(w, "Fail "+err.Error(), 500)
-		log.Println("Delete Fail " + r.URL.Path + " " + r.RemoteAddr + " " + err.Error())
+		log.Println("Delete Fail " + file + " " + r.RemoteAddr + " " + err.Error())
 		return
 	}
 

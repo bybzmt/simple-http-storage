@@ -1,0 +1,23 @@
+{
+    "name": "bybzmt/simple-http-storage",
+    "description": "php tcp locker and golang server",
+    "keywords": ["http-storage"],
+    "homepage": "http://github.com/bybzmt/simple-http-storage",
+    "type": "library",
+    "license": "Apache-2.0",
+    "authors": [
+        {
+            "name": "bybzmt",
+            "email": "other@bybzmt.me",
+            "homepage": "http://github.com/bybzmt"
+        }
+    ],
+    "require": {
+        "php": ">=5.4.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "bybzmt\\HttpStorage\\": "phpclient/"
+        }
+    }
+}
