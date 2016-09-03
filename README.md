@@ -15,3 +15,22 @@
 
 # phpclient
 这是一个简单http客户端
+
+安装
+
+`composer require bybzmt/simple-http-storage`
+
+使用示例:
+
+```php
+$storage = new SimpleHttpStorage($server, $port, $timeout);
+//上传
+$storage->put(__FILE__, '/test.txt');
+//下载
+$storage->get("/test.txt", "./test.txt");
+删除
+$storage->delete("/test.txt");
+//判断文件是否存在
+var_dump($storage->exists("/test.txt"));
+```
+
