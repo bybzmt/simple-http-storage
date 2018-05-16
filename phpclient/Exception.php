@@ -1,5 +1,5 @@
 <?php
-namespace bybzmt\HttpStorage;
+namespace Bybzmt\HttpStorage;
 
 class Exception extends \Exception
 {

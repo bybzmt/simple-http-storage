@@ -1,5 +1,5 @@
 <?php
-namespace bybzmt\HttpStorage;
+namespace Bybzmt\HttpStorage;
 
 /**
  * 简易HTTP文件系统PHP客户端
